@@ -1,313 +1,1107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WealthOS — Real-Time Engine</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #07080f; --s1: #0e0f1a; --s2: #141520; --s3: #1c1d2e; --border: #252638; --border2: #2e3050;
-            --p: #818cf8; --p2: #6366f1; --gold: #fbbf24; --green: #34d399; --red: #f87171; --blue: #60a5fa;
-            --text: #e2e8f0; --muted: #64748b; --muted2: #94a3b8;
-        }
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{ background:var(--bg);color:var(--text); font-family:'Outfit',sans-serif; min-height:100vh; background-image: radial-gradient(ellipse 80% 40% at 10% 0%,rgba(99,102,241,0.08) 0%,transparent 60%); }
-        .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-        @media(max-width:900px){.app{grid-template-columns:1fr}}
-        .sidebar{ background:var(--s1);border-right:1px solid var(--border); padding:28px 20px;display:flex;flex-direction:column;gap:8px; position:sticky;top:0;height:100vh;overflow-y:auto; }
-        @media(max-width:900px){.sidebar{display:none}}
-        .logo{ font-size:1.25rem;font-weight:800;color:var(--text);margin-bottom:24px;padding-bottom:20px; border-bottom:1px solid var(--border); display:flex;align-items:center;gap:10px; }
-        .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--p);box-shadow:0 0 12px var(--p)}
-        .nav-item{ display:flex;align-items:center;gap:10px;padding:10px 14px; border-radius:10px;cursor:pointer;font-size:0.88rem;font-weight:500; color:var(--muted2);transition:all 0.18s;border:none;background:none;width:100%;text-align:left; }
-        .nav-item:hover,.nav-item.active{background:var(--s3);color:var(--text)}
-        .nav-item.active{background:rgba(99,102,241,0.15);color:var(--p)}
-        .main{overflow-y:auto;display:flex;flex-direction:column}
-        .topbar{ background:rgba(14,15,26,0.9);border-bottom:1px solid var(--border); padding:16px 28px;display:flex;align-items:center;justify-content:space-between; position:sticky;top:0;z-index:100;backdrop-filter:blur(12px); }
-        .topbar-title{font-size:1.1rem;font-weight:700}
-        .goal-badge{ background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3); color:var(--gold);padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:600; }
-        .content{padding:28px;flex:1}
-        .section{display:none}
-        .section.active{display:block}
-        .card{ background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px; position:relative;overflow:hidden; margin-bottom: 20px;}
-        .card::before{ content:'';position:absolute;top:0;left:0;right:0;height:2px; background:linear-gradient(90deg,var(--p),transparent 60%); }
-        .card-title{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px}
-        .kpi-val{font-size:1.8rem;font-weight:700;font-family:'JetBrains Mono',monospace;}
-        .kpi-sub{font-size:0.75rem;color:var(--muted2);margin-top:5px}
-        .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-        @media(max-width:1100px){.grid-4,.grid-3{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:700px){.grid-4,.grid-2,.grid-3{grid-template-columns:1fr}}
-        .prog-wrap{background:var(--s3);border-radius:20px;height:10px;overflow:hidden;margin:8px 0 24px 0}
-        .prog-bar{height:100%;border-radius:20px;transition:width 1s cubic-bezier(0.4, 0, 1, 1);background:linear-gradient(90deg,var(--p2),var(--p))}
-        .btn{ display:inline-flex;align-items:center;gap:8px;padding:10px 20px; border-radius:10px;font-size:0.88rem; font-weight:600;cursor:pointer;border:none;transition:all 0.18s; }
-        .btn-primary{ background:linear-gradient(135deg,var(--p2),#4f46e5);color:white; }
-        textarea, input{ width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px; color:var(--text); padding:10px; outline:none; font-family: inherit; }
-        .heatmap-dot{ min-width:35px; height:35px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; cursor:pointer; transition: all 0.2s; user-select: none; }
-        .heatmap-dot:hover { transform: scale(1.1); filter: brightness(1.2); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WealthOS — ₹1 Crore Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07080f;
+  --s1: #0e0f1a;
+  --s2: #141520;
+  --s3: #1c1d2e;
+  --border: #252638;
+  --border2: #2e3050;
+  --p: #818cf8;
+  --p2: #6366f1;
+  --gold: #fbbf24;
+  --green: #34d399;
+  --red: #f87171;
+  --blue: #60a5fa;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Outfit',sans-serif;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 80% 40% at 10% 0%,rgba(99,102,241,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 30% at 90% 100%,rgba(251,191,36,0.05) 0%,transparent 60%);
+}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+@media(max-width:900px){.app{grid-template-columns:1fr}}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--s1);border-right:1px solid var(--border);
+  padding:28px 20px;display:flex;flex-direction:column;gap:8px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+@media(max-width:900px){.sidebar{display:none}}
+.logo{
+  font-size:1.25rem;font-weight:800;letter-spacing:-0.5px;
+  color:var(--text);margin-bottom:24px;padding-bottom:20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--p);box-shadow:0 0 12px var(--p)}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:10px;cursor:pointer;font-size:0.88rem;font-weight:500;
+  color:var(--muted2);transition:all 0.18s;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover,.nav-item.active{background:var(--s3);color:var(--text)}
+.nav-item.active{background:rgba(99,102,241,0.15);color:var(--p)}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+.sidebar-footer{margin-top:auto;padding-top:20px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--muted);line-height:1.5}
+
+/* ── MAIN ── */
+.main{overflow-y:auto;display:flex;flex-direction:column}
+
+/* ── TOP BAR ── */
+.topbar{
+  background:var(--s1);border-bottom:1px solid var(--border);
+  padding:16px 28px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);
+  background:rgba(14,15,26,0.9);
+}
+.topbar-title{font-size:1.1rem;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.goal-badge{
+  background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.3);
+  color:var(--gold);padding:6px 14px;border-radius:20px;font-size:0.8rem;font-weight:600;
+}
+
+/* ── CONTENT ── */
+.content{padding:28px;flex:1}
+.section{display:none}
+.section.active{display:block}
+
+/* ── CARDS ── */
+.card{
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:20px;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--p),transparent 60%);
+}
+.card.gold::before{background:linear-gradient(90deg,var(--gold),transparent 60%)}
+.card.green::before{background:linear-gradient(90deg,var(--green),transparent 60%)}
+.card.red::before{background:linear-gradient(90deg,var(--red),transparent 60%)}
+.card.blue::before{background:linear-gradient(90deg,var(--blue),transparent 60%)}
+.card-title{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px}
+.kpi-val{font-size:2rem;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1}
+.kpi-sub{font-size:0.78rem;color:var(--muted2);margin-top:5px}
+
+/* ── GRID ── */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.grid-4,.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* ── INPUT AREA ── */
+.input-zone{
+  border:2px dashed var(--border2);border-radius:14px;padding:24px;
+  margin-bottom:20px;transition:border-color 0.2s;background:var(--s1);
+}
+.input-zone:focus-within{border-color:var(--p)}
+.input-label{font-size:0.8rem;font-weight:600;color:var(--muted2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.input-label span{background:var(--p2);color:white;border-radius:4px;padding:2px 7px;font-size:0.7rem}
+textarea{
+  width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.78rem;
+  padding:14px;resize:vertical;outline:none;line-height:1.6;
+  transition:border-color 0.2s;
+}
+textarea:focus{border-color:var(--p)}
+.input-hint{font-size:0.73rem;color:var(--muted);margin-top:8px;line-height:1.5}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 20px;
+  border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.88rem;
+  font-weight:600;cursor:pointer;border:none;transition:all 0.18s;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--p2),#4f46e5);color:white;
+  box-shadow:0 4px 20px rgba(99,102,241,0.3);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(99,102,241,0.4)}
+.btn-primary:disabled{opacity:0.5;transform:none;cursor:not-allowed}
+.btn-ghost{background:var(--s3);color:var(--muted2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--border2);color:var(--text)}
+.btn-sm{padding:7px 14px;font-size:0.8rem}
+
+/* ── GOAL SETTINGS ── */
+.settings-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.settings-label{font-size:0.83rem;color:var(--muted2);width:160px;flex-shrink:0}
+input[type=number],input[type=range],select{
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:0.88rem;
+  padding:8px 12px;outline:none;transition:border-color 0.2s;
+}
+input[type=number]:focus,select:focus{border-color:var(--p)}
+input[type=range]{padding:4px;cursor:pointer;accent-color:var(--p);width:180px}
+
+/* ── AI CHAT ── */
+.ai-panel{
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  display:flex;flex-direction:column;height:500px;overflow:hidden;margin-bottom:20px;
+}
+.ai-header{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(99,102,241,0.1),transparent);
+}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0.4)}50%{box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+.ai-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.ai-messages::-webkit-scrollbar{width:4px}
+.ai-messages::-webkit-scrollbar-track{background:transparent}
+.ai-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.msg{max-width:85%;padding:12px 16px;border-radius:12px;font-size:0.85rem;line-height:1.6}
+.msg-ai{background:var(--s3);color:var(--text);border-radius:12px 12px 12px 2px;align-self:flex-start;border:1px solid var(--border2)}
+.msg-user{background:linear-gradient(135deg,var(--p2),#4f46e5);color:white;border-radius:12px 12px 2px 12px;align-self:flex-end}
+.msg-ai strong{color:var(--p)}
+.msg-ai .tag-bad{color:var(--red)}
+.msg-ai .tag-good{color:var(--green)}
+.msg-ai .tag-warn{color:var(--gold)}
+.ai-input-row{padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:10px}
+.ai-input{
+  flex:1;background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:0.85rem;
+  padding:10px 14px;outline:none;transition:border-color 0.2s;
+}
+.ai-input:focus{border-color:var(--p)}
+.typing{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* ── FUND ROWS ── */
+.fund-table{width:100%;border-collapse:collapse;font-size:0.82rem}
+.fund-table th{
+  text-align:left;padding:10px 12px;color:var(--muted);
+  font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;
+  border-bottom:1px solid var(--border);
+}
+.fund-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.fund-table tr:last-child td{border-bottom:none}
+.fund-table tr:hover td{background:var(--s2)}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.tag-keep{background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.25)}
+.tag-exit{background:rgba(248,113,113,0.12);color:var(--red);border:1px solid rgba(248,113,113,0.25)}
+.tag-reduce{background:rgba(251,191,36,0.12);color:var(--gold);border:1px solid rgba(251,191,36,0.25)}
+.tag-watch{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.25)}
+.pos{color:var(--green)}.neg{color:var(--red)}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{background:var(--s3);border-radius:20px;height:10px;overflow:hidden;margin:8px 0}
+.prog-bar{height:100%;border-radius:20px;transition:width 1s ease;background:linear-gradient(90deg,var(--p2),var(--p))}
+
+/* ── CHART CONTAINER ── */
+.chart-wrap{position:relative;height:240px}
+
+/* ── ALERT BOXES ── */
+.alert{
+  display:flex;gap:12px;padding:12px 16px;border-radius:10px;margin-bottom:10px;
+  font-size:0.83rem;line-height:1.5;border:1px solid;
+}
+.alert-red{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.25);color:var(--text)}
+.alert-gold{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.25);color:var(--text)}
+.alert-green{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.25);color:var(--text)}
+.alert-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+
+/* ── LOADING SPINNER ── */
+.spinner{
+  width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);
+  border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SECTIONS TITLE ── */
+.section-title{font-size:1.1rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── QUICK CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{
+  background:var(--s3);border:1px solid var(--border2);color:var(--muted2);
+  padding:6px 14px;border-radius:20px;font-size:0.78rem;cursor:pointer;
+  transition:all 0.15s;
+}
+.chip:hover{background:rgba(99,102,241,0.15);border-color:var(--p);color:var(--p)}
+
+/* ── SCENARIO TABLE ── */
+.scenario-table{width:100%;border-collapse:collapse;font-size:0.82rem}
+.scenario-table th{padding:10px 14px;text-align:left;color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
+.scenario-table td{padding:10px 14px;border-bottom:1px solid var(--border)}
+.scenario-table tr.highlight td{background:rgba(99,102,241,0.1)}
+.scenario-table tr:last-child td{border-bottom:none}
+.hit{color:var(--green);font-weight:600}
+
+/* ── TOOLTIP ── */
+[data-tip]{position:relative;cursor:help}
+[data-tip]:hover::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
+  transform:translateX(-50%);background:#1e1f2e;border:1px solid var(--border2);
+  color:var(--text);padding:6px 10px;border-radius:6px;font-size:0.72rem;
+  white-space:nowrap;z-index:999;pointer-events:none;
+}
+
+.disclaimer{font-size:0.72rem;color:var(--muted);margin-top:24px;padding:14px;background:var(--s1);border-radius:10px;border:1px solid var(--border);line-height:1.6}
+</style>
 </head>
 <body>
-    <div class="app">
-        <aside class="sidebar">
-            <div class="logo"><div class="logo-dot"></div>WealthOS</div>
-            <button class="nav-item active" onclick="showSection('dashboard')">◈ Dashboard</button>
-            <button class="nav-item" onclick="showSection('input')">⊕ Settings & Data</button>
-            <button class="nav-item" onclick="showSection('projections')">◉ Projections</button>
-        </aside>
+<div class="app">
 
-        <main class="main">
-            <div class="topbar">
-                <div class="topbar-title" id="section-heading">Dashboard</div>
-                <div class="goal-badge" id="goal-display">Goal: —</div>
-            </div>
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="logo"><div class="logo-dot"></div>WealthOS</div>
+  <button class="nav-item active" onclick="showSection('dashboard')"><span class="nav-icon">◈</span> Dashboard</button>
+  <button class="nav-item" onclick="showSection('input')"><span class="nav-icon">⊕</span> Update Portfolio</button>
+  <button class="nav-item" onclick="showSection('analysis')"><span class="nav-icon">⊞</span> Fund Analysis</button>
+  <button class="nav-item" onclick="showSection('projections')"><span class="nav-icon">◉</span> Projections</button>
+  <button class="nav-item" onclick="showSection('advisor')"><span class="nav-icon">✦</span> AI Advisor</button>
+  <div class="sidebar-footer">
+    Portfolio as on<br><strong id="last-updated">—</strong><br><br>
+    Not financial advice.<br>For educational use only.
+  </div>
+</aside>
 
-            <div class="content">
-                <div id="sec-dashboard" class="section active">
-                    <div class="grid-4">
-                        <div class="card"><div class="card-title">Total Corpus</div><div class="kpi-val" id="kpi-total">—</div></div>
-                        <div class="card"><div class="card-title">Goal Progress</div><div class="kpi-val" id="kpi-progress-pct">—</div></div>
-                        <div class="card"><div class="card-title">Current P&L</div><div class="kpi-val" id="kpi-pnl">—</div></div>
-                        <div class="card"><div class="card-title">Habit Streak</div><div class="kpi-val" id="current-streak">0</div><div class="kpi-sub">Months</div></div>
-                    </div>
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="section-heading">Dashboard</div>
+    <div class="topbar-right">
+      <div class="goal-badge" id="goal-display">Goal: ₹1,00,00,000</div>
+      <button class="btn btn-ghost btn-sm" onclick="showSection('input')">⊕ Update</button>
+    </div>
+  </div>
 
-                    <div class="prog-wrap"><div class="prog-bar" id="goal-progbar"></div></div>
+  <div class="content">
 
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <div class="card-title" style="margin-bottom:0">📅 Consistency Heatmap (Click to Toggle)</div>
-                        </div>
-                        <div id="heatmap-container" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;"></div>
-                    </div>
+    <!-- ════════ DASHBOARD ════════ -->
+    <div id="sec-dashboard" class="section active">
+      <div class="grid-4" id="kpi-row">
+        <div class="card"><div class="card-title">Total Corpus</div><div class="kpi-val" id="kpi-total">—</div><div class="kpi-sub">MF + Stocks + Debt</div></div>
+        <div class="card gold"><div class="card-title">Goal</div><div class="kpi-val mono" id="kpi-goal">₹1,00,00,000</div><div class="kpi-sub" id="kpi-progress-pct">—% achieved</div></div>
+        <div class="card green"><div class="card-title">Overall P&L</div><div class="kpi-val" id="kpi-pnl">—</div><div class="kpi-sub" id="kpi-pnl-pct">—</div></div>
+        <div class="card" id="xirr-card"><div class="card-title">Portfolio XIRR</div><div class="kpi-val" id="kpi-xirr">—</div><div class="kpi-sub" id="kpi-xirr-note">—</div></div>
+      </div>
 
-                    <div class="card blue">
-                        <div class="card-title">⚡ Real-Time Savings Momentum</div>
-                        <div class="grid-3" style="gap:15px; margin-bottom:0;">
-                            <div>
-                                <div class="card-title" style="margin-bottom:5px">Add Extra Capital</div>
-                                <div style="display:flex; gap:8px;">
-                                    <button class="btn btn-primary" onclick="trackSaving(500)">+ ₹500</button>
-                                    <button class="btn btn-primary" onclick="trackSaving(2000)">+ ₹2k</button>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="card-title" style="margin-bottom:5px">Extra Total</div>
-                                <div class="kpi-val" id="habit-total">₹0</div>
-                            </div>
-                            <div>
-                                <div class="card-title" style="margin-bottom:5px">Freedom Gained</div>
-                                <div class="kpi-val" id="time-gained" style="color:var(--p)">0 Days</div>
-                                <div class="kpi-sub">Based on current SIP</div>
-                            </div>
-                        </div>
-                    </div>
+      <div class="prog-wrap" style="height:14px;margin-bottom:24px" data-tip="Progress toward ₹1 Crore goal">
+        <div class="prog-bar" id="goal-progbar" style="width:0%"></div>
+      </div>
 
-                    <div class="grid-2">
-                        <div class="card"><div class="card-title">Dynamic Growth (10Y)</div><canvas id="projChart" height="220"></canvas></div>
-                        <div class="card"><div class="card-title">Asset Allocation</div><canvas id="allocChart" height="220"></canvas></div>
-                    </div>
-                </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Corpus Growth Projection</div>
+          <div class="chart-wrap"><canvas id="projChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Asset Allocation</div>
+          <div class="chart-wrap"><canvas id="allocChart"></canvas></div>
+        </div>
+      </div>
 
-                <div id="sec-input" class="section">
-                    <div class="card">
-                        <div class="card-title">Global Parameters (Real-time)</div>
-                        <div class="grid-3">
-                            <div><label class="kpi-sub">Target Goal (₹)</label><input type="number" id="goal-amount" value="10000000" oninput="updateAll()"></div>
-                            <div><label class="kpi-sub">Monthly SIP (₹)</label><input type="number" id="monthly-sip" value="25000" oninput="updateAll()"></div>
-                            <div><label class="kpi-sub">Return Rate (%)</label><input type="number" id="return-rate" value="12" oninput="updateAll()"></div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">Paste Portfolio Data (Updates instantly)</div>
-                        <textarea id="mf-input" rows="10" placeholder="Name    Units    Invested    Current" oninput="updateAll()"></textarea>
-                        <div class="kpi-sub" style="margin-top:10px">Paste columns from Excel or Broker. Columns: Name, [skip], Invested, Current.</div>
-                    </div>
-                </div>
+      <div id="alert-zone"></div>
 
-                <div id="sec-projections" class="section">
-                    <div class="card">
-                        <div class="card-title">Compounding Forecast (15 Years)</div>
-                        <div id="step-up-impact"></div>
-                    </div>
-                </div>
-            </div>
-        </main>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Top Performers 🟢</div>
+          <div id="top-performers"></div>
+        </div>
+        <div class="card red">
+          <div class="card-title">Underperformers 🔴</div>
+          <div id="under-performers"></div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        let state = { 
-            mfFunds: [], 
-            totalInvested: 0, 
-            totalCurrent: 0, 
-            goal: 10000000, 
-            monthlySip: 25000, 
-            returnRate: 0.12, 
-            extraSaved: 0,
-            // Track 12 months status
-            investmentHistory: [true, true, true, true, false, true, true, true, true, true, true, true] 
-        };
-        let charts = {};
+    <!-- ════════ INPUT ════════ -->
+    <div id="sec-input" class="section">
+      <div class="section-title">⊕ Update Your Portfolio</div>
 
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('sec-' + id).classList.add('active');
-            document.getElementById('section-heading').textContent = id.charAt(0).toUpperCase() + id.slice(1);
-            if(id === 'dashboard') updateAll();
+      <div class="grid-2" style="margin-bottom:20px">
+        <div>
+          <div class="card gold" style="margin-bottom:16px">
+            <div class="card-title">🎯 Goal Settings</div>
+            <div class="settings-row">
+              <span class="settings-label">Target Amount</span>
+              <input type="number" id="goal-amount" value="10000000" style="width:180px" oninput="updateGoalDisplay()">
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Monthly SIP (₹)</span>
+              <input type="number" id="monthly-sip" value="20000" style="width:180px">
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Timeline (years)</span>
+              <input type="range" id="timeline" min="3" max="20" value="8" oninput="document.getElementById('tl-val').textContent=this.value">
+              <span id="tl-val" class="mono" style="color:var(--p);font-weight:600;width:30px">8</span>
+            </div>
+            <div class="settings-row">
+              <span class="settings-label">Expected Return</span>
+              <select id="return-rate">
+                <option value="10">10% (Conservative)</option>
+                <option value="12" selected>12% (Moderate)</option>
+                <option value="14">14% (Optimistic)</option>
+                <option value="16">16% (Aggressive)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="font-size:0.82rem;line-height:1.8;color:var(--muted2)">
+          <div class="card-title">📋 How to Paste Data</div>
+          <strong style="color:var(--text)">Mutual Funds:</strong> Paste the tab-separated table directly from Groww/Kuvera/MFCentral. Include columns: Scheme Name, AMC, Category, Units, Invested Value, Current Value, XIRR<br><br>
+          <strong style="color:var(--text)">Stocks:</strong> Paste from Zerodha/Groww: Stock Name, Quantity, Avg Buy Price, Buy Value, Current Price, Current Value, P&L<br><br>
+          <strong style="color:var(--text)">Summary line:</strong> Paste the summary row "Total Investments [tab] Current Portfolio Value [tab] Profit/Loss..." at the top for best results.<br><br>
+          <span style="color:var(--gold)">💡 Tab-separated data works best. Your previous data has been pre-loaded.</span>
+        </div>
+      </div>
+
+      <div class="input-zone">
+        <div class="input-label">Mutual Funds Data <span>TSV / Tab-separated</span></div>
+        <textarea id="mf-input" rows="10" placeholder="Paste mutual fund data here...
+Example:
+Scheme Name	AMC	Category	Sub-category	Units	Invested Value	Current Value	XIRR
+Parag Parikh Flexi Cap Fund Direct Growth	PPFAS	Equity	Flexi Cap	355.811	31998.37	32175.56	0.76%
+UTI Nifty 50 Index Fund Direct Growth	UTI Mutual Fund	Equity	Large Cap	93.915	15999.35	15931.29	-0.58%"></textarea>
+        <div class="input-hint">💡 Tip: Copy directly from your broker app's holdings table and paste here.</div>
+      </div>
+
+      <div class="input-zone">
+        <div class="input-label">Stocks / Equity Holdings <span>TSV / Tab-separated</span></div>
+        <textarea id="stock-input" rows="8" placeholder="Paste stock holdings here...
+Example:
+Stock Name	Quantity	Average buy price	Buy value	Closing price	Closing value	Unrealised P&L
+TATA STEEL LIMITED	52	155.11	8065.72	195	10140	2074.28
+ONGC	8	155.36	1242.88	269.2	2153.6	910.72"></textarea>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="processPortfolio()">
+          <span id="parse-btn-text">⚡ Analyse Portfolio</span>
+          <div id="parse-spinner" class="spinner" style="display:none"></div>
+        </button>
+        <button class="btn btn-ghost" onclick="loadSampleData()">Load Sample Data</button>
+        <button class="btn btn-ghost" onclick="clearAll()">Clear All</button>
+      </div>
+    </div>
+
+    <!-- ════════ FUND ANALYSIS ════════ -->
+    <div id="sec-analysis" class="section">
+      <div class="section-title">⊞ Fund Analysis & Recommendations</div>
+      <div id="analysis-content">
+        <div style="text-align:center;padding:60px;color:var(--muted)">
+          <div style="font-size:2.5rem;margin-bottom:12px">📊</div>
+          <div>Update your portfolio first to see analysis</div>
+          <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="showSection('input')">Go to Update Portfolio</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ PROJECTIONS ════════ -->
+    <div id="sec-projections" class="section">
+      <div class="section-title">◉ Wealth Projections</div>
+      <div id="projections-content">
+        <div style="text-align:center;padding:60px;color:var(--muted)">
+          <div style="font-size:2.5rem;margin-bottom:12px">📈</div>
+          <div>Update your portfolio to see projections</div>
+          <button class="btn btn-primary btn-sm" style="margin-top:16px" onclick="showSection('input')">Go to Update Portfolio</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ AI ADVISOR ════════ -->
+    <div id="sec-advisor" class="section">
+      <div class="section-title">✦ AI Advisor</div>
+      <div class="chips" id="quick-chips">
+        <div class="chip" onclick="askAI('What are the biggest issues with my portfolio right now?')">🔍 Portfolio issues</div>
+        <div class="chip" onclick="askAI('Which funds should I exit immediately and why?')">🚪 Exit candidates</div>
+        <div class="chip" onclick="askAI('How can I optimise my SIP allocation to reach ₹1 crore faster?')">🎯 SIP optimisation</div>
+        <div class="chip" onclick="askAI('What is the realistic timeline for me to reach ₹1 crore?')">⏱ Realistic timeline</div>
+        <div class="chip" onclick="askAI('Which stocks in my portfolio should I hold long term?')">📈 Stock picks</div>
+        <div class="chip" onclick="askAI('How should I rebalance my portfolio for moderate risk?')">⚖️ Rebalancing</div>
+      </div>
+      <div class="ai-panel">
+        <div class="ai-header">
+          <div class="ai-dot"></div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem">Portfolio AI Advisor</div>
+            <div style="font-size:0.72rem;color:var(--muted)">Powered by Claude · Analyses your actual portfolio data</div>
+          </div>
+        </div>
+        <div class="ai-messages" id="ai-messages">
+          <div class="msg msg-ai">
+            👋 Hi! I'm your AI portfolio advisor. I can analyse your mutual funds and stocks, identify issues, suggest rebalancing strategies, and help you map the fastest path to your ₹1 crore goal.<br><br>
+            <strong>Update your portfolio data first</strong>, then ask me anything using the quick chips above or type your own question below.
+          </div>
+        </div>
+        <div class="ai-input-row">
+          <input class="ai-input" id="ai-query" placeholder="Ask about your portfolio..." onkeydown="if(event.key==='Enter')sendAIMessage()">
+          <button class="btn btn-primary btn-sm" onclick="sendAIMessage()">Send ↑</button>
+        </div>
+      </div>
+      <div class="disclaimer">⚠️ This tool is for educational and tracking purposes only. It does not constitute financial advice. All projections are illustrative. Consult a SEBI-registered investment advisor before making investment decisions. Past returns do not guarantee future performance.</div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let state = {
+  mfFunds: [],
+  stocks: [],
+  totalInvested: 0,
+  totalCurrent: 0,
+  totalPnl: 0,
+  goal: 10000000,
+  monthlySip: 20000,
+  timeline: 8,
+  returnRate: 0.12,
+  hasData: false
+};
+
+let projChartInst = null;
+let allocChartInst = null;
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  const map = {dashboard:'Dashboard',input:'Update Portfolio',analysis:'Fund Analysis',projections:'Projections',advisor:'AI Advisor'};
+  document.getElementById('section-heading').textContent = map[id] || id;
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.textContent.trim().toLowerCase().includes(map[id]?.toLowerCase().split(' ')[0]?.toLowerCase())) n.classList.add('active');
+  });
+}
+
+function updateGoalDisplay() {
+  const v = parseInt(document.getElementById('goal-amount').value) || 10000000;
+  state.goal = v;
+  document.getElementById('kpi-goal').textContent = '₹' + formatNum(v);
+  document.getElementById('goal-display').textContent = 'Goal: ₹' + formatNum(v);
+}
+
+// ═══════════════════════════════════════════════
+// SAMPLE DATA
+// ═══════════════════════════════════════════════
+const SAMPLE_MF = `Scheme Name	AMC	Category	Sub-category	Units	Invested Value	Current Value	XIRR
+Quant Mid Cap Fund Direct Growth	Quant Mutual Fund	Equity	Mid Cap	22.471	4999.69	4881.04	N/A
+HDFC Silver ETF FoF Direct Growth	HDFC Mutual Fund	Commodities	Silver	70.37	2999.86	3121.23	50.06%
+SBI Small Cap Fund Direct Growth	SBI Mutual Fund	Equity	Small Cap	87.608	16999.13	15667.98	25.86%
+Parag Parikh Flexi Cap Fund Direct Growth	PPFAS Mutual Fund	Equity	Flexi Cap	355.811	31998.37	32175.56	0.76%
+ICICI Prudential Gold ETF FoF Direct Growth	ICICI Prudential Mutual Fund	Commodities	Gold	107.675	3999.8	5506.81	117.26%
+Tata Digital India Fund Direct Growth	Tata Mutual Fund	Equity	Sectoral	603.959	26998.88	27663.01	1.08%
+Quant Small Cap Fund Direct Plan Growth	Quant Mutual Fund	Equity	Small Cap	249.963	57997.24	62814.75	5.83%
+Quant Infrastructure Fund Direct Growth	Quant Mutual Fund	Equity	Sectoral	131.803	4999.74	5060	0.57%
+Tata Small Cap Fund Direct Growth	Tata Mutual Fund	Equity	Small Cap	417.238	17999.07	15541.7	-17.16%
+Motilal Oswal Midcap Fund Direct Growth	Motilal Oswal Mutual Fund	Equity	Mid Cap	249.691	29998.48	24850.95	-11.99%
+SBI Gold Direct Plan Growth	SBI Mutual Fund	Commodities	Gold	100.294	3999.79	4903.28	107.29%
+ICICI Prudential Silver ETF FoF Direct Growth	ICICI Prudential Mutual Fund	Commodities	Silver	175.763	3999.82	7201.17	304.17%
+UTI Nifty 50 Index Fund Direct Growth	UTI Mutual Fund	Equity	Large Cap	145.68	24998.88	24712.46	-0.58%
+Parag Parikh Flexi Cap Fund Direct Growth	PPFAS Mutual Fund	Equity	Flexi Cap	87.502	7999.61	7912.7	N/A
+Quant ELSS Tax Saver Fund Direct Growth	Quant Mutual Fund	Equity	ELSS	15.981	4999.46	6396.72	10.17%
+JioBlackRock Sector Rotation Fund Direct Growth	JioBlackRock Mutual Fund	Equity	Thematic	101.008	999.96	969.07	N/A`;
+
+const SAMPLE_STOCKS = `Stock Name	Quantity	Average buy price	Buy value	Closing price	Closing value	Unrealised P&L
+ADANI POWER LTD	5	18	90	138.94	694.7	604.7
+BHEL	10	71.8	718	258.65	2586.5	1868.5
+TATA STEEL LIMITED	52	155.11	8065.72	195	10140	2074.28
+TATA MOTORS LIMITED	6	186.11	1116.66	459.15	2754.9	1638.24
+THE INDIAN HOTELS CO. LTD	4	209.27	837.08	629.4	2517.6	1680.52
+OIL AND NATURAL GAS CORP.	8	155.36	1242.88	269.2	2153.6	910.72
+TATA POWER CO LTD	6	227.33	1363.98	381.3	2287.8	923.82
+ITC LTD	8	254.86	2038.88	309.05	2472.4	433.52
+INDIAN OIL CORP LTD	8	101.97	815.76	159.94	1279.52	463.76
+MARICO LIMITED	1	510.55	510.55	789.9	789.9	279.35
+ADANI TOTAL GAS LIMITED	1	900	900	472.45	472.45	-427.55
+TATA MOTORS PASS VEH LTD	6	411.36	2468.16	345.2	2071.2	-396.96
+DALMIA BHARAT LIMITED	2	2197.7	4395.4	1849	3698	-697.4
+TRIDENT LIMITED	5	39.6	198	23.24	116.2	-81.8`;
+
+function loadSampleData() {
+  document.getElementById('mf-input').value = SAMPLE_MF;
+  document.getElementById('stock-input').value = SAMPLE_STOCKS;
+}
+
+function clearAll() {
+  document.getElementById('mf-input').value = '';
+  document.getElementById('stock-input').value = '';
+}
+
+// ═══════════════════════════════════════════════
+// PARSE + PROCESS
+// ═══════════════════════════════════════════════
+function parseTSV(text) {
+  if (!text.trim()) return [];
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split('\t').map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const cells = line.split('\t').map(c => c.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = cells[i] || '');
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+
+function parseNum(s) {
+  if (!s) return 0;
+  const n = parseFloat(String(s).replace(/[₹,%\s]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+function formatNum(n) {
+  if (n >= 10000000) return (n/10000000).toFixed(2) + ' Cr';
+  if (n >= 100000) return (n/100000).toFixed(2) + ' L';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return Math.round(n).toLocaleString('en-IN');
+}
+
+function formatRs(n) { return '₹' + formatNum(n); }
+
+function processPortfolio() {
+  const mfText = document.getElementById('mf-input').value;
+  const stockText = document.getElementById('stock-input').value;
+
+  if (!mfText.trim() && !stockText.trim()) {
+    alert('Please paste your portfolio data first.');
+    return;
+  }
+
+  // Parse goal settings
+  state.goal = parseInt(document.getElementById('goal-amount').value) || 10000000;
+  state.monthlySip = parseInt(document.getElementById('monthly-sip').value) || 20000;
+  state.timeline = parseInt(document.getElementById('timeline').value) || 8;
+  state.returnRate = parseFloat(document.getElementById('return-rate').value) / 100;
+
+  // Parse MF
+  const mfRaw = parseTSV(mfText);
+  state.mfFunds = mfRaw.map(r => {
+    const inv = parseNum(r['Invested Value']) || parseNum(r['invested_value']) || parseNum(r['Buy Value']);
+    const cur = parseNum(r['Current Value']) || parseNum(r['current_value']);
+    const xirrStr = r['XIRR'] || r['xirr'] || '';
+    const xirr = xirrStr === 'N/A' || !xirrStr ? null : parseNum(xirrStr);
+    return {
+      name: r['Scheme Name'] || r['scheme_name'] || r['Fund Name'] || 'Unknown',
+      amc: r['AMC'] || r['amc'] || '',
+      category: r['Category'] || r['category'] || 'Equity',
+      subcat: r['Sub-category'] || r['subcategory'] || '',
+      invested: inv, current: cur,
+      pnl: cur - inv,
+      pnlPct: inv > 0 ? ((cur - inv) / inv * 100) : 0,
+      xirr
+    };
+  }).filter(f => f.invested > 0 || f.current > 0);
+
+  // Parse Stocks
+  const stRaw = parseTSV(stockText);
+  state.stocks = stRaw.map(r => {
+    const buy = parseNum(r['Buy value']) || parseNum(r['buy_value']) || parseNum(r['Invested Value']);
+    const cur = parseNum(r['Closing value']) || parseNum(r['closing_value']) || parseNum(r['Current Value']);
+    const pnl = parseNum(r['Unrealised P&L']) || parseNum(r['pnl']) || (cur - buy);
+    return {
+      name: r['Stock Name'] || r['stock_name'] || r['Symbol'] || 'Unknown',
+      qty: parseNum(r['Quantity'] || r['qty'] || '1'),
+      avgPrice: parseNum(r['Average buy price'] || r['avg_price']),
+      buyValue: buy, currentValue: cur,
+      currentPrice: parseNum(r['Closing price'] || r['closing_price'] || r['Current Price']),
+      pnl, pnlPct: buy > 0 ? (pnl / buy * 100) : 0
+    };
+  }).filter(s => s.buyValue > 0 || s.currentValue > 0);
+
+  // Aggregate
+  const mfInv = state.mfFunds.reduce((a, f) => a + f.invested, 0);
+  const mfCur = state.mfFunds.reduce((a, f) => a + f.current, 0);
+  const stInv = state.stocks.reduce((a, s) => a + s.buyValue, 0);
+  const stCur = state.stocks.reduce((a, s) => a + s.currentValue, 0);
+
+  state.totalInvested = mfInv + stInv;
+  state.totalCurrent = mfCur + stCur;
+  state.totalPnl = state.totalCurrent - state.totalInvested;
+  state.hasData = true;
+  document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-IN');
+
+  renderDashboard();
+  renderAnalysis();
+  renderProjections();
+  showSection('dashboard');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  const { totalCurrent, totalInvested, totalPnl, goal, mfFunds, stocks } = state;
+  const pnlPct = totalInvested > 0 ? (totalPnl / totalInvested * 100) : 0;
+  const progress = Math.min((totalCurrent / goal) * 100, 100);
+
+  document.getElementById('kpi-total').textContent = formatRs(totalCurrent);
+  document.getElementById('kpi-pnl').textContent = (totalPnl >= 0 ? '+' : '') + formatRs(totalPnl);
+  document.getElementById('kpi-pnl').className = 'kpi-val ' + (totalPnl >= 0 ? 'pos' : 'neg');
+  document.getElementById('kpi-pnl-pct').textContent = (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(2) + '% returns';
+  document.getElementById('kpi-progress-pct').textContent = progress.toFixed(1) + '% achieved';
+  document.getElementById('goal-progbar').style.width = progress + '%';
+  document.getElementById('kpi-goal').textContent = formatRs(goal);
+
+  // Calc rough XIRR proxy from weighted MF XIRRs
+  const xirrFunds = mfFunds.filter(f => f.xirr !== null && !isNaN(f.xirr));
+  let weightedXirr = null;
+  if (xirrFunds.length > 0) {
+    const totalW = xirrFunds.reduce((a,f) => a+f.current, 0);
+    weightedXirr = totalW > 0 ? xirrFunds.reduce((a,f) => a + (f.xirr * f.current / totalW), 0) : null;
+  }
+  if (weightedXirr !== null) {
+    document.getElementById('kpi-xirr').textContent = weightedXirr.toFixed(1) + '%';
+    document.getElementById('kpi-xirr').className = 'kpi-val ' + (weightedXirr < 8 ? 'neg' : weightedXirr < 12 ? '' : 'pos');
+    document.getElementById('kpi-xirr-note').textContent = weightedXirr < 8 ? '⚠️ Below FD rates!' : weightedXirr < 12 ? 'Moderate' : '✓ Good';
+    document.getElementById('xirr-card').className = 'card ' + (weightedXirr < 8 ? 'red' : weightedXirr < 12 ? '' : 'green');
+  } else {
+    document.getElementById('kpi-xirr').textContent = 'N/A';
+    document.getElementById('kpi-xirr-note').textContent = 'Add XIRR data';
+  }
+
+  // Alerts
+  renderAlerts();
+
+  // Charts
+  renderProjChart();
+  renderAllocChart();
+
+  // Top/Under performers
+  const allHoldings = [
+    ...mfFunds.map(f => ({name: f.name.split(' ').slice(0,3).join(' '), pnl: f.pnl, pnlPct: f.pnlPct, current: f.current})),
+    ...stocks.map(s => ({name: s.name.split(' ').slice(0,3).join(' '), pnl: s.pnl, pnlPct: s.pnlPct, current: s.currentValue}))
+  ].filter(h => h.current > 0);
+
+  const sorted = [...allHoldings].sort((a,b) => b.pnlPct - a.pnlPct);
+  const top = sorted.slice(0,5);
+  const under = sorted.slice(-5).reverse();
+
+  document.getElementById('top-performers').innerHTML = top.map(h => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:0.82rem">
+      <span style="color:var(--muted2)">${h.name}</span>
+      <span class="pos mono">+${h.pnlPct.toFixed(1)}%</span>
+    </div>`).join('');
+
+  document.getElementById('under-performers').innerHTML = under.map(h => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:0.82rem">
+      <span style="color:var(--muted2)">${h.name}</span>
+      <span class="${h.pnlPct>=0?'pos':'neg'} mono">${h.pnlPct>=0?'+':''}${h.pnlPct.toFixed(1)}%</span>
+    </div>`).join('');
+}
+
+function renderAlerts() {
+  const { mfFunds, totalCurrent, goal } = state;
+  const alerts = [];
+
+  // AMC concentration
+  const amcCount = {};
+  mfFunds.forEach(f => amcCount[f.amc] = (amcCount[f.amc]||0) + 1);
+  Object.entries(amcCount).filter(([,c]) => c >= 3).forEach(([amc, c]) => {
+    alerts.push({type:'red', msg: `<strong>AMC Concentration:</strong> You have ${c} funds from ${amc}. Single AMC failure amplifies risk.`});
+  });
+
+  // Too many funds
+  if (mfFunds.length > 10) {
+    alerts.push({type:'gold', msg: `<strong>Over-diversification:</strong> ${mfFunds.length} MF schemes is too many. Overlapping holdings reduce alpha. Aim for 5–7 funds.`});
+  }
+
+  // Negative XIRR funds
+  const badFunds = mfFunds.filter(f => f.xirr !== null && f.xirr < 0);
+  if (badFunds.length > 0) {
+    alerts.push({type:'red', msg: `<strong>Negative XIRR:</strong> ${badFunds.map(f=>f.name.split(' ').slice(0,3).join(' ')).join(', ')} — consider exiting these.`});
+  }
+
+  // Debt allocation
+  const debtCur = mfFunds.filter(f => f.category === 'Debt').reduce((a,f) => a+f.current, 0);
+  const debtPct = state.totalCurrent > 0 ? (debtCur / state.totalCurrent * 100) : 0;
+  if (debtPct < 10) {
+    alerts.push({type:'gold', msg: `<strong>Low Debt Allocation:</strong> Only ${debtPct.toFixed(1)}% in debt. For moderate risk, consider 15–20% in debt/liquid funds as a buffer.`});
+  }
+
+  // Small cap overweight
+  const scFunds = mfFunds.filter(f => f.subcat === 'Small Cap' || f.subcat === 'Small cap');
+  if (scFunds.length >= 3) {
+    alerts.push({type:'gold', msg: `<strong>Small Cap Overweight:</strong> ${scFunds.length} small cap funds — high overlap. Consolidate to 1 fund.`});
+  }
+
+  // Good sign
+  const goldSilver = mfFunds.filter(f => f.category === 'Commodities' && f.pnlPct > 20);
+  if (goldSilver.length > 0) {
+    alerts.push({type:'green', msg: `<strong>Gold/Silver Performing Well:</strong> ${goldSilver.map(f=>f.name.split(' ').slice(0,3).join(' ')).join(', ')} are strong hedges. Keep these.`});
+  }
+
+  const gap = goal - totalCurrent;
+  alerts.push({type:'gold', msg: `<strong>Gap to Goal:</strong> ₹${formatNum(gap)} remaining (${((totalCurrent/goal)*100).toFixed(1)}% achieved). Stay consistent with SIPs.`});
+
+  document.getElementById('alert-zone').innerHTML = alerts.map(a =>
+    `<div class="alert alert-${a.type}"><div class="alert-icon">${a.type==='red'?'🔴':a.type==='green'?'✅':'⚠️'}</div><div>${a.msg}</div></div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════
+function renderProjChart() {
+  const { totalCurrent, monthlySip, returnRate, goal, timeline } = state;
+  const rm = returnRate / 12;
+  const maxYears = Math.max(timeline + 2, 10);
+  const labels = Array.from({length: maxYears + 1}, (_, i) => i === 0 ? 'Now' : `Yr ${i}`);
+
+  const projData = labels.map((_, y) => {
+    const fvL = totalCurrent * Math.pow(1 + returnRate, y);
+    const n = y * 12;
+    const fvS = n === 0 ? 0 : monthlySip * ((Math.pow(1 + rm, n) - 1) / rm);
+    return Math.round((fvL + fvS) / 100000) / 10;
+  });
+
+  const goalLine = labels.map(() => goal / 100000);
+
+  if (projChartInst) projChartInst.destroy();
+  const ctx = document.getElementById('projChart').getContext('2d');
+  projChartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Projected Corpus',
+          data: projData,
+          borderColor: '#818cf8',
+          backgroundColor: 'rgba(129,140,248,0.08)',
+          borderWidth: 2.5, fill: true, tension: 0.4, pointRadius: 3
+        },
+        {
+          label: `₹${formatNum(goal)} Goal`,
+          data: goalLine,
+          borderColor: '#34d399',
+          borderDash: [6, 3], borderWidth: 1.5,
+          fill: false, pointRadius: 0
         }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 14 } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ₹${ctx.parsed.y} L` } }
+      },
+      scales: {
+        x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#1c1d2e' } },
+        y: { ticks: { color: '#64748b', font: { size: 10 }, callback: v => `₹${v}L` }, grid: { color: '#1c1d2e' } }
+      }
+    }
+  });
+}
 
-        function calculateFV(P, r, PMT, n) {
-            if (n === 0) return P;
-            const i = r / 12;
-            const months = n * 12;
-            const lumpSum = P * Math.pow(1 + i, months);
-            const sipPart = PMT * ((Math.pow(1 + i, months) - 1) / i) * (1 + i);
-            return lumpSum + sipPart;
-        }
+function renderAllocChart() {
+  const { mfFunds, stocks } = state;
+  const cats = {};
+  mfFunds.forEach(f => cats[f.category] = (cats[f.category]||0) + f.current);
+  const stockTotal = stocks.reduce((a,s) => a + s.currentValue, 0);
+  if (stockTotal > 0) cats['Direct Stocks'] = stockTotal;
 
-        function toggleMonth(index) {
-            state.investmentHistory[index] = !state.investmentHistory[index];
-            updateAll();
-        }
+  const labels = Object.keys(cats);
+  const data = Object.values(cats);
+  const colors = ['#818cf8','#fbbf24','#34d399','#f87171','#60a5fa','#a78bfa','#fb923c'];
 
-        function renderHabitTracker() {
-            const container = document.getElementById('heatmap-container');
-            container.innerHTML = '';
-            let streak = 0;
-            let active = true;
+  if (allocChartInst) allocChartInst.destroy();
+  const ctx2 = document.getElementById('allocChart').getContext('2d');
+  allocChartInst = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors.slice(0, labels.length),
+        borderColor: '#0e0f1a', borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ₹${formatNum(ctx.parsed)}` } }
+      }
+    }
+  });
+}
 
-            // Display in reverse chronological order (newest month right)
-            state.investmentHistory.forEach((didInvest, index) => {
-                const dot = document.createElement('div');
-                dot.className = 'heatmap-dot';
-                dot.onclick = () => toggleMonth(index);
-                
-                if(didInvest) {
-                    dot.style.background = 'rgba(52, 211, 153, 0.15)';
-                    dot.style.border = '1px solid var(--green)';
-                    dot.style.color = 'var(--green)';
-                    dot.textContent = '✓';
-                } else {
-                    dot.style.background = 'rgba(248, 113, 113, 0.1)';
-                    dot.style.border = '1px solid var(--red)';
-                    dot.style.color = 'var(--red)';
-                    dot.textContent = '✕';
-                }
-                container.appendChild(dot);
-            });
+// ═══════════════════════════════════════════════
+// RENDER ANALYSIS
+// ═══════════════════════════════════════════════
+function renderAnalysis() {
+  const { mfFunds, stocks } = state;
 
-            // Calculate streak (consecutive true from the end)
-            for (let i = state.investmentHistory.length - 1; i >= 0; i--) {
-                if (state.investmentHistory[i]) streak++;
-                else break;
-            }
-            document.getElementById('current-streak').textContent = streak;
-        }
+  const fundRows = mfFunds.map(f => {
+    let action = 'KEEP', tagClass = 'tag-keep';
+    if (f.xirr !== null && f.xirr < 0) { action = 'EXIT'; tagClass = 'tag-exit'; }
+    else if (f.xirr !== null && f.xirr < 5) { action = 'REVIEW'; tagClass = 'tag-watch'; }
+    else if (f.subcat === 'Thematic' || f.subcat === 'Sectoral') { action = 'REDUCE'; tagClass = 'tag-reduce'; }
+    const amcCount = mfFunds.filter(x => x.amc === f.amc).length;
+    if (amcCount >= 3 && action === 'KEEP') { action = 'REDUCE'; tagClass = 'tag-reduce'; }
 
-        function trackSaving(amt) {
-            state.extraSaved += amt;
-            updateAll();
-        }
+    return `<tr>
+      <td style="font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</td>
+      <td style="color:var(--muted2)">${f.category}</td>
+      <td class="mono">${formatRs(f.invested)}</td>
+      <td class="mono">${formatRs(f.current)}</td>
+      <td class="mono ${f.pnl>=0?'pos':'neg'}">${f.pnl>=0?'+':''}${formatRs(f.pnl)}</td>
+      <td class="mono ${f.xirr===null?'':f.xirr<0?'neg':f.xirr<8?'':f.xirr<12?'':'pos'}">${f.xirr === null ? 'N/A' : f.xirr.toFixed(1)+'%'}</td>
+      <td><span class="tag ${tagClass}">${action}</span></td>
+    </tr>`;
+  }).join('');
 
-        function updateAll() {
-            // 1. Sync Inputs to State
-            state.goal = parseFloat(document.getElementById('goal-amount').value) || 0;
-            state.monthlySip = parseFloat(document.getElementById('monthly-sip').value) || 0;
-            state.returnRate = (parseFloat(document.getElementById('return-rate').value) || 0) / 100;
+  const stockRows = stocks.map(s => {
+    let action = 'HOLD', tagClass = 'tag-keep';
+    if (s.pnlPct < -20) { action = 'REVIEW'; tagClass = 'tag-watch'; }
+    if (s.pnlPct < -30) { action = 'EXIT'; tagClass = 'tag-exit'; }
+    if (s.pnlPct > 50) { action = 'BOOK PARTIAL'; tagClass = 'tag-reduce'; }
+    return `<tr>
+      <td style="font-weight:500">${s.name}</td>
+      <td class="mono">${s.qty}</td>
+      <td class="mono">${formatRs(s.avgPrice)}</td>
+      <td class="mono">${formatRs(s.currentPrice)}</td>
+      <td class="mono ${s.pnl>=0?'pos':'neg'}">${s.pnl>=0?'+':''}${formatRs(s.pnl)}</td>
+      <td class="mono ${s.pnlPct>=0?'pos':'neg'}">${s.pnlPct>=0?'+':''}${s.pnlPct.toFixed(1)}%</td>
+      <td><span class="tag ${tagClass}">${action}</span></td>
+    </tr>`;
+  }).join('');
 
-            // 2. Parse Portfolio Textarea
-            const raw = document.getElementById('mf-input').value.trim();
-            if(raw) {
-                const lines = raw.split('\n');
-                state.mfFunds = lines.map(l => {
-                    const c = l.split(/\t|    /); // Split by tab or 4 spaces
-                    const clean = v => parseFloat(v?.replace(/[^\d.-]/g, '')) || 0;
-                    return { name: c[0] || 'Unknown Fund', inv: clean(c[c.length-2]), cur: clean(c[c.length-1]) };
-                });
-            }
+  document.getElementById('analysis-content').innerHTML = `
+    <div class="section-title">Mutual Funds (${mfFunds.length} schemes)</div>
+    <div class="card" style="overflow-x:auto;margin-bottom:20px">
+      <table class="fund-table">
+        <thead><tr><th>Fund</th><th>Category</th><th>Invested</th><th>Current</th><th>P&L</th><th>XIRR</th><th>Action</th></tr></thead>
+        <tbody>${fundRows}</tbody>
+      </table>
+    </div>
+    <div class="section-title">Direct Stocks (${stocks.length} holdings)</div>
+    <div class="card" style="overflow-x:auto">
+      <table class="fund-table">
+        <thead><tr><th>Stock</th><th>Qty</th><th>Avg Price</th><th>CMP</th><th>P&L</th><th>Return</th><th>Action</th></tr></thead>
+        <tbody>${stockRows}</tbody>
+      </table>
+    </div>`;
+}
 
-            state.totalInvested = state.mfFunds.reduce((a,f) => a+f.inv, 0);
-            state.totalCurrent = (state.mfFunds.reduce((a,f) => a+f.cur, 0)) + state.extraSaved;
+// ═══════════════════════════════════════════════
+// RENDER PROJECTIONS
+// ═══════════════════════════════════════════════
+function renderProjections() {
+  const { totalCurrent, goal } = state;
+  const scenarios = [
+    [15000, 10, 7], [15000, 10, 8], [15000, 12, 8],
+    [20000, 12, 7], [20000, 12, 8], [20000, 14, 8],
+    [25000, 12, 7], [25000, 12, 8], [25000, 14, 8],
+    [35000, 14, 7], [35000, 14, 8],
+    [50000, 14, 7], [50000, 14, 8],
+  ];
 
-            // 3. Update Dashboard KPIs
-            document.getElementById('goal-display').textContent = 'Goal: ₹' + state.goal.toLocaleString('en-IN');
-            document.getElementById('kpi-total').textContent = '₹' + (state.totalCurrent/100000).toFixed(2) + 'L';
-            document.getElementById('habit-total').textContent = '₹' + state.extraSaved.toLocaleString('en-IN');
-            
-            const progress = Math.min((state.totalCurrent / state.goal * 100), 100).toFixed(1);
-            document.getElementById('kpi-progress-pct').textContent = progress + '%';
-            document.getElementById('goal-progbar').style.width = progress + '%';
-            document.getElementById('kpi-pnl').textContent = '₹' + ((state.totalCurrent - state.totalInvested)/100000).toFixed(2) + 'L';
-            
-            const dailySip = state.monthlySip / 30 || 1;
-            document.getElementById('time-gained').textContent = (state.extraSaved / dailySip).toFixed(1) + ' Days';
+  function project(sip, rate, years) {
+    const rm = rate / 100 / 12;
+    const n = years * 12;
+    return totalCurrent * Math.pow(1 + rate/100, years) + sip * ((Math.pow(1+rm,n)-1)/rm);
+  }
 
-            // 4. Update Charts & Projections
-            renderHabitTracker();
-            updateCharts();
-            renderStepUp();
-        }
+  const rows = scenarios.map(([sip, rate, years]) => {
+    const val = project(sip, rate, years);
+    const hit = val >= goal;
+    return `<tr ${hit?'class="highlight"':''}>
+      <td class="mono">₹${(sip/1000).toFixed(0)}K/mo</td>
+      <td>${rate}%</td>
+      <td>${years} yrs</td>
+      <td class="mono ${hit?'hit':''}">${hit?'✓ ':''} ${formatRs(val)}</td>
+      <td>${hit ? `<span class="tag tag-keep">HITS GOAL</span>` : `<span style="color:var(--muted);font-size:0.75rem">₹${formatNum(goal-val)} short</span>`}</td>
+    </tr>`;
+  }).join('');
 
-        function updateCharts() {
-            // Allocation Chart
-            const ctxA = document.getElementById('allocChart').getContext('2d');
-            if(charts.alloc) charts.alloc.destroy();
-            charts.alloc = new Chart(ctxA, {
-                type: 'doughnut',
-                data: {
-                    labels: state.mfFunds.map(f => f.name),
-                    datasets: [{
-                        data: state.mfFunds.map(f => f.cur),
-                        backgroundColor: state.mfFunds.map((_, i) => `hsl(${220 + (i * 30)}, 70%, 60%)`),
-                        borderWidth: 0
-                    }]
-                },
-                options: { responsive: true, plugins: { legend: { display: false } }, cutout: '70%' }
-            });
+  // Minimum SIP needed for target years at 12%
+  const rm = 0.12/12;
+  function sipNeeded(years) {
+    const fvLump = totalCurrent * Math.pow(1.12, years);
+    const n = years * 12;
+    const gap = goal - fvLump;
+    if (gap <= 0) return 0;
+    return gap * rm / (Math.pow(1+rm,n)-1);
+  }
 
-            // Growth Projection
-            const ctxP = document.getElementById('projChart').getContext('2d');
-            if(charts.proj) charts.proj.destroy();
-            const points = [0, 2, 5, 10].map(y => calculateFV(state.totalCurrent, state.returnRate, state.monthlySip, y));
-            charts.proj = new Chart(ctxP, {
-                type: 'line',
-                data: { 
-                    labels: ['Now', '2Y', '5Y', '10Y'], 
-                    datasets: [{ 
-                        label:'Future Value', 
-                        data: points, 
-                        borderColor: '#818cf8', tension: 0.4, fill: true, backgroundColor: 'rgba(129, 140, 248, 0.1)', pointRadius: 4
-                    }] 
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false } } } }
-            });
-        }
+  document.getElementById('projections-content').innerHTML = `
+    <div class="grid-3" style="margin-bottom:20px">
+      <div class="card green">
+        <div class="card-title">SIP needed @ 12% in 7 years</div>
+        <div class="kpi-val mono">${formatRs(Math.round(sipNeeded(7)))}</div>
+        <div class="kpi-sub">per month</div>
+      </div>
+      <div class="card gold">
+        <div class="card-title">SIP needed @ 12% in 8 years</div>
+        <div class="kpi-val mono">${formatRs(Math.round(sipNeeded(8)))}</div>
+        <div class="kpi-sub">per month</div>
+      </div>
+      <div class="card">
+        <div class="card-title">SIP needed @ 12% in 10 years</div>
+        <div class="kpi-val mono">${formatRs(Math.round(sipNeeded(10)))}</div>
+        <div class="kpi-sub">per month</div>
+      </div>
+    </div>
+    <div class="card" style="overflow-x:auto;margin-bottom:20px">
+      <div class="card-title">All Scenarios — What You'll Reach</div>
+      <table class="scenario-table">
+        <thead><tr><th>Monthly SIP</th><th>Return Rate</th><th>Timeline</th><th>Final Corpus</th><th>Status</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="alert alert-gold">
+      <div class="alert-icon">💡</div>
+      <div><strong>Step-Up SIP Strategy:</strong> Increasing your SIP by 10% each year can add 30–40% more to your final corpus. Starting at ₹20K and stepping up annually can reach ₹1Cr ~2 years earlier than a flat SIP.</div>
+    </div>`;
+}
 
-        function renderStepUp() {
-            let stepUpFV = state.totalCurrent;
-            let currentSip = state.monthlySip;
-            const years = 15;
+// ═══════════════════════════════════════════════
+// AI ADVISOR
+// ═══════════════════════════════════════════════
+function buildPortfolioContext() {
+  const { mfFunds, stocks, totalInvested, totalCurrent, totalPnl, goal, monthlySip, timeline, returnRate } = state;
+  const mfSummary = mfFunds.slice(0,20).map(f =>
+    `${f.name} | ${f.category}/${f.subcat} | Invested: ₹${f.invested.toFixed(0)} | Current: ₹${f.current.toFixed(0)} | P&L: ${f.pnl.toFixed(0)} | XIRR: ${f.xirr===null?'N/A':f.xirr+'%'}`
+  ).join('\n');
 
-            for(let i=0; i<years; i++) {
-                stepUpFV = calculateFV(stepUpFV, state.returnRate, currentSip, 1);
-                currentSip *= 1.10; // 10% Step-up annually
-            }
+  const stSummary = stocks.slice(0,20).map(s =>
+    `${s.name} | Qty: ${s.qty} | Avg: ₹${s.avgPrice} | CMP: ₹${s.currentPrice} | P&L: ${s.pnl.toFixed(0)} (${s.pnlPct.toFixed(1)}%)`
+  ).join('\n');
 
-            document.getElementById('step-up-impact').innerHTML = `
-                <div style="font-size: 2.5rem; font-weight:800; color:var(--green); margin: 10px 0;">
-                    ₹${(stepUpFV/10000000).toFixed(2)} Cr
-                </div>
-                <div class="kpi-sub">Forecasted 15-year wealth assuming a 10% annual SIP step-up and constant ${ (state.returnRate * 100).toFixed(1) }% returns.</div>
-            `;
-        }
+  return `PORTFOLIO SUMMARY (as on ${new Date().toLocaleDateString('en-IN')}):
+Total Invested: ₹${totalInvested.toFixed(0)}
+Total Current Value: ₹${totalCurrent.toFixed(0)}
+Total P&L: ₹${totalPnl.toFixed(0)} (${(totalPnl/totalInvested*100).toFixed(1)}%)
+Goal: ₹${goal.toLocaleString('en-IN')}
+Monthly SIP Capacity: ₹${monthlySip.toLocaleString('en-IN')}
+Target Timeline: ${timeline} years
+Expected Return Rate: ${(returnRate*100)}%
 
-        window.onload = () => {
-            // Load some sample data on start
-            document.getElementById('mf-input').value = "Nifty 50 Index Fund\t1000\t500000\t680000\nMidcap Alpha Fund\t500\t300000\t450000";
-            updateAll();
-        };
-    </script>
+MUTUAL FUNDS (${mfFunds.length} schemes):
+${mfSummary}
+
+DIRECT STOCKS (${stocks.length} holdings):
+${stSummary}`;
+}
+
+async function askAI(question) {
+  if (!state.hasData) {
+    addMsg('ai', "Please update your portfolio data first so I can give you personalised advice. Go to <strong>Update Portfolio</strong> and paste your holdings.");
+    showSection('advisor');
+    return;
+  }
+  showSection('advisor');
+  document.getElementById('ai-query').value = question;
+  await sendAIMessage();
+}
+
+async function sendAIMessage() {
+  const input = document.getElementById('ai-query');
+  const question = input.value.trim();
+  if (!question) return;
+
+  input.value = '';
+  addMsg('user', question);
+
+  const typingId = addTyping();
+
+  const portfolioCtx = state.hasData ? buildPortfolioContext() : "No portfolio data loaded yet.";
+
+  const systemPrompt = `You are a knowledgeable Indian investment advisor assistant helping a retail investor track and optimise their portfolio to reach their financial goal. You have deep knowledge of Indian mutual funds, direct equity, tax implications (LTCG/STCG), and SEBI regulations.
+
+Analyse the portfolio data provided and give specific, actionable advice. Be direct and honest. Use ₹ for amounts. Format key points with **bold** for emphasis. Keep responses concise but insightful (3-6 sentences or a short bulleted list). Always ground advice in the actual data provided.
+
+Important: You are not a SEBI-registered advisor. Always end responses touching on specific buy/sell advice with a brief disclaimer.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: `Portfolio Data:\n${portfolioCtx}\n\nQuestion: ${question}` }]
+      })
+    });
+
+    removeTyping(typingId);
+    const data = await res.json();
+    const text = data.content?.[0]?.text || "Sorry, I couldn't process that. Please try again.";
+    addMsg('ai', formatAIText(text));
+  } catch (e) {
+    removeTyping(typingId);
+    addMsg('ai', "⚠️ Couldn't connect to AI. Please check your connection and try again.");
+  }
+}
+
+function formatAIText(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/• /g, '• ')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+function addMsg(type, content) {
+  const el = document.createElement('div');
+  el.className = `msg msg-${type}`;
+  el.innerHTML = content;
+  const container = document.getElementById('ai-messages');
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+  return el.id = 'msg-' + Date.now();
+}
+
+function addTyping() {
+  const id = 'typing-' + Date.now();
+  const el = document.createElement('div');
+  el.id = id;
+  el.className = 'msg msg-ai';
+  el.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  document.getElementById('ai-messages').appendChild(el);
+  document.getElementById('ai-messages').scrollTop = 9999;
+  return id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ═══════════════════════════════════════════════
+// INIT — load sample data on first visit
+// ═══════════════════════════════════════════════
+window.addEventListener('load', () => {
+  loadSampleData();
+  processPortfolio();
+});
+</script>
 </body>
 </html>
